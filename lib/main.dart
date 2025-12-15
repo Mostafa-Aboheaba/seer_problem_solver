@@ -8,7 +8,7 @@ Future<void> main() async {
       // Get this from: Settings > Projects > [Your Project] > Client Keys (DSN)
       options.dsn = const String.fromEnvironment(
         'SENTRY_DSN',
-        defaultValue: '', // Set your DSN here or via environment variable
+        defaultValue: 'https://6ab6c6493824f9ef5bc8ccc121684e1b@o4510538598907904.ingest.us.sentry.io/4510538601988096mostafa-aboheaba', // Set your DSN here or via environment variable
       );
       
       // Set the environment (production, test, development)
