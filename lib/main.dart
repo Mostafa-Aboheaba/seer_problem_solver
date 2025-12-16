@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:seer_problem_solver/utils/error_handler.dart';
 
 Future<void> main() async {
   await SentryFlutter.init(
@@ -26,8 +27,8 @@ Future<void> main() async {
         defaultValue: '1.0.0+1',
       );
       
-      // Enable debug mode in development
-      options.debug = const bool.fromEnvironment('SENTRY_DEBUG', defaultValue: false);
+      // Enable debug mode in development to see Sentry logs
+      options.debug = const bool.fromEnvironment('SENTRY_DEBUG', defaultValue: true);
     },
     appRunner: () => runApp(const MyApp()),
   );
@@ -102,6 +103,35 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  /// Trigger a test error to verify Sentry integration
+  Future<void> _triggerTestError() async {
+    try {
+      // This will throw an exception that Sentry will capture
+      throw Exception('Test error: This is your first Sentry error!');
+    } catch (error, stackTrace) {
+      // Report the error to Sentry
+      await ErrorHandler.reportError(
+        error,
+        stackTrace,
+        context: {
+          'action': 'test_error',
+          'counter_value': _counter,
+        },
+      );
+      
+      // Show a snackbar to confirm the error was triggered
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Test error sent to Sentry! Check your Sentry dashboard.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -143,6 +173,25 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: _triggerTestError,
+              icon: const Icon(Icons.bug_report),
+              label: const Text('Trigger Test Error'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Click to send a test error to Sentry',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
