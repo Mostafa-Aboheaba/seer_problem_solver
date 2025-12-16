@@ -52,6 +52,5 @@ app.*.map.json
 
 sentry.properties
 
-sentry.properties
-
-sentry.properties
+# Sentry wizard binary (too large for git)
+sentry-wizard
