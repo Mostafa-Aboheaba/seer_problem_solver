@@ -105,30 +105,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// Trigger a test error to verify Sentry integration
   Future<void> _triggerTestError() async {
-    try {
-      // This will throw an exception that Sentry will capture
-      throw Exception('Test error: This is your first Sentry error!');
-    } catch (error, stackTrace) {
-      // Report the error to Sentry
-      await ErrorHandler.reportError(
-        error,
-        stackTrace,
-        context: {
-          'action': 'test_error',
-          'counter_value': _counter,
-        },
+    // Report a test message to Sentry instead of throwing an exception
+    await ErrorHandler.reportMessage(
+      'Test error: This is your first Sentry error!',
+      level: SentryLevel.error,
+      context: {
+        'action': 'test_error',
+        'counter_value': _counter,
+      },
+    );
+    
+    // Show a snackbar to confirm the error was triggered
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Test error sent to Sentry! Check your Sentry dashboard.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
       );
-      
-      // Show a snackbar to confirm the error was triggered
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Test error sent to Sentry! Check your Sentry dashboard.'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
     }
   }
 
